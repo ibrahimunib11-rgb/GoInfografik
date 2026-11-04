@@ -1,0 +1,741 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Home, Volume2, VolumeX, Maximize, Minimize, Search, ArrowRight, ArrowLeft, 
+  Star, Heart, CheckCircle, Info, BookOpen, Music, Map, Shield, Play, 
+  Lightbulb, Camera, PieChart, Layout, MessageSquare, Link, ChevronRight,
+  Smile, ThumbsUp, AlertCircle, Eye
+} from 'lucide-react';
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [soundOn, setSoundOn] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [modalData, setModalData] = useState({ isOpen: false, title: '', content: '' });
+
+  const totalPages = 13;
+
+  const toggleFullscreen = () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(err => {
+            setModalData({ 
+              isOpen: true, 
+              title: "Layar Penuh Diblokir", 
+              content: "Lingkungan browser atau panel pratinjau saat ini memblokir mode Layar Penuh (Fullscreen) untuk alasan keamanan." 
+            });
+          });
+        } else {
+           setModalData({ isOpen: true, title: "Tidak Didukung", content: "Browser Anda tidak mendukung mode layar penuh." });
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    } catch (error) {
+      setModalData({ isOpen: true, title: "Layar Penuh Gagal", content: "Terjadi kesalahan sistem saat mencoba memperbesar layar." });
+    }
+  };
+
+  const toggleSound = () => {
+    setSoundOn(!soundOn);
+    // Dummy sound effect logic
+  };
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const goHome = () => setCurrentPage(1);
+
+  const showModal = (title, content) => {
+    setModalData({ isOpen: true, title, content });
+  };
+
+  const closeModal = () => {
+    setModalData({ isOpen: false, title: '', content: '' });
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    
+    // Mendengarkan perubahan layar (misal jika siswa menekan tombol ESC)
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-yellow-50 font-sans text-slate-800 flex flex-col relative overflow-hidden">
+      
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md shadow-sm z-50 flex items-center justify-between px-4 md:px-8 border-b-4 border-blue-400">
+        <div className="flex items-center gap-3">
+          <div className="bg-orange-500 p-2 rounded-xl text-white">
+            <Search size={24} />
+          </div>
+          <h1 className="font-extrabold text-lg md:text-xl text-blue-900 hidden sm:block">
+            PETUALANGAN BEDAH INFOGRAFIK
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 md:gap-4">
+          <button onClick={goHome} className="p-2 rounded-full hover:bg-blue-100 text-blue-600 transition" title="Ke Beranda">
+            <Home size={24} />
+          </button>
+          <button onClick={toggleSound} className="p-2 rounded-full hover:bg-blue-100 text-blue-600 transition" title="Suara">
+            {soundOn ? <Volume2 size={24} /> : <VolumeX size={24} />}
+          </button>
+          <button onClick={toggleFullscreen} className="p-2 rounded-full hover:bg-blue-100 text-blue-600 transition" title="Layar Penuh">
+            {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+          </button>
+        </div>
+      </header>
+
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 mt-16 mb-20 overflow-y-auto p-4 md:p-8 flex justify-center w-full">
+        <div className="w-full max-w-5xl bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border-4 border-white overflow-hidden relative">
+          <div className="p-6 md:p-10 h-full">
+            {currentPage === 1 && <Page1 goNext={nextPage} />}
+            {currentPage === 2 && <Page2 />}
+            {currentPage === 3 && <Page3 />}
+            {currentPage === 4 && <Page4 />}
+            {currentPage === 5 && <Page5 showModal={showModal} />}
+            {currentPage === 6 && <Page6 />}
+            {currentPage === 7 && <Page7 showModal={showModal} />}
+            {currentPage === 8 && <Page8 showModal={showModal} />}
+            {currentPage === 9 && <Page9 showModal={showModal} />}
+            {currentPage === 10 && <Page10 showModal={showModal} />}
+            {currentPage === 11 && <Page11 />}
+            {currentPage === 12 && <Page12 goHome={goHome} />}
+            {currentPage === 13 && <Page13 />}
+          </div>
+        </div>
+      </main>
+
+      {/* FOOTER NAVIGATION */}
+      <footer className="fixed bottom-0 left-0 right-0 h-20 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 flex items-center justify-between px-4 md:px-8 border-t-4 border-yellow-400">
+        <button 
+          onClick={prevPage} 
+          disabled={currentPage === 1}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed bg-gray-200 text-gray-500' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
+        >
+          <ArrowLeft size={20} /> <span className="hidden sm:inline">Kembali</span>
+        </button>
+        
+        <div className="flex gap-1 md:gap-2">
+          {[...Array(totalPages)].map((_, i) => (
+            <div key={i} className={`w-2 md:w-3 h-2 md:h-3 rounded-full ${currentPage === i + 1 ? 'bg-orange-500 scale-125' : 'bg-gray-300'}`} />
+          ))}
+        </div>
+
+        <button 
+          onClick={nextPage} 
+          disabled={currentPage === totalPages}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed bg-gray-200 text-gray-500' : 'bg-green-500 hover:bg-green-600 text-white shadow-lg transform hover:-translate-y-1'}`}
+        >
+          <span className="hidden sm:inline">Lanjut</span> <ArrowRight size={20} />
+        </button>
+      </footer>
+
+      {/* GLOBAL MODAL */}
+      {modalData.isOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl animate-bounce-in relative">
+            <h3 className="text-2xl font-black text-blue-900 mb-4">{modalData.title}</h3>
+            <p className="text-lg text-slate-700 mb-8">{modalData.content}</p>
+            <button onClick={closeModal} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition shadow-md">
+              Oke, Mengerti!
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================= PAGE COMPONENTS ================= */
+
+function Page1({ goNext }) {
+  return (
+    <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in space-y-8 py-10">
+      <div className="bg-yellow-100 p-6 rounded-full inline-block mb-4 shadow-inner border-4 border-yellow-300">
+        <Search size={80} className="text-orange-500 animate-pulse" />
+      </div>
+      <h1 className="text-4xl md:text-6xl font-black text-blue-900 leading-tight">
+        PETUALANGAN BEDAH <span className="text-orange-500">INFOGRAFIK</span>
+      </h1>
+      <h2 className="text-xl md:text-2xl font-bold text-green-600 bg-green-100 px-6 py-2 rounded-full inline-block">
+        Bahasa Indonesia - Kelas 6 SD
+      </h2>
+      <p className="text-lg md:text-2xl text-slate-600 max-w-2xl italic mt-6 border-l-4 border-blue-500 pl-4">
+        "Gunakan mata untuk mengamati, akal untuk memahami, dan hati untuk mensyukuri!"
+      </p>
+      <div className="mt-8 flex flex-col sm:flex-row gap-4">
+        <button onClick={goNext} className="bg-orange-500 hover:bg-orange-600 text-white text-xl font-bold py-4 px-10 rounded-full shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2">
+          Mulai Petualangan <Play size={24} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Page2() {
+  const tujuan = [
+    "Mengenali bagian-bagian infografik.",
+    "Mengidentifikasi unsur visual (gambar, warna, simbol, letak).",
+    "Menganalisis informasi dan data dalam infografik.",
+    "Menemukan pesan utama dan tujuan infografik.",
+    "Mengevaluasi kesesuaian gambar dengan informasi.",
+    "Bekerja sama dan menghargai pendapat teman.",
+    "Mensyukuri nikmat akal dan penglihatan dari Allah SWT."
+  ];
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-black text-blue-900">Misi Pembelajaran Kita</h2>
+        <p className="text-lg text-slate-500 mt-2">Setelah petualangan ini selesai, kamu akan mampu:</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {tujuan.map((item, index) => (
+          <div key={index} className="bg-white border-2 border-green-200 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4 group">
+            <div className="bg-green-100 text-green-600 w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 group-hover:bg-green-500 group-hover:text-white transition-colors">
+              {index + 1}
+            </div>
+            <p className="text-lg font-semibold text-slate-700">{item}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Page3() {
+  const [revealed, setRevealed] = useState({});
+
+  const questions = [
+    { q: "Apa yang pertama kali kamu lihat ketika memperhatikan gambar tersebut?", a: "Biasanya gambar atau warnanya yang mencolok!" },
+    { q: "Mengapa pembuatnya menggunakan gambar dan warna?", a: "Agar menarik perhatian dan tidak membosankan." },
+    { q: "Apakah informasi dalam gambar lebih mudah dipahami dibandingkan paragraf panjang?", a: "Tentu! Gambar membantu otak kita mencerna info lebih cepat." },
+    { q: "Apa fungsi utama sebuah infografik?", a: "Menyampaikan informasi rumit menjadi sederhana dan menarik." }
+  ];
+
+  const toggleReveal = (index) => setRevealed(prev => ({ ...prev, [index]: !prev[index] }));
+
+  return (
+    <div className="h-full animate-fade-in">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-6">Apersepsi: Mari Mengamati!</h2>
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/2 flex justify-center items-center w-full">
+          {/* Gambar/Visual Rasio 16:9 yang Menarik */}
+          <div className="w-full aspect-video rounded-3xl shadow-2xl border-4 border-white relative overflow-hidden transform hover:scale-[1.02] transition-all duration-300 group">
+             <img 
+               src="Gemini_Generated_Image_4559wb4559wb4559_2.jpg" 
+               alt="Ilustrasi Infografik Panduan Kebersihan" 
+               className="w-full h-full object-cover"
+             />
+             <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+          </div>
+        </div>
+        <div className="md:w-1/2 flex flex-col justify-center space-y-4">
+          <p className="font-bold text-orange-600 bg-orange-100 px-4 py-2 rounded-lg inline-block self-start">Klik pertanyaan di bawah ini:</p>
+          {questions.map((item, index) => (
+            <div key={index} className="bg-white border-2 border-blue-100 rounded-xl overflow-hidden shadow-sm">
+              <button onClick={() => toggleReveal(index)} className="w-full text-left p-4 font-bold text-blue-900 hover:bg-blue-50 flex justify-between items-center transition-colors">
+                {item.q}
+                <ChevronRight className={`transform transition-transform ${revealed[index] ? 'rotate-90 text-orange-500' : 'text-slate-400'}`} />
+              </button>
+              {revealed[index] && (
+                <div className="p-4 bg-green-50 border-t border-blue-100 text-green-800 font-semibold animate-fade-in">
+                  💡 {item.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page4() {
+  const elements = [
+    { icon: <Layout />, title: "Judul", desc: "Topik utama." },
+    { icon: <Camera />, title: "Gambar", desc: "Memperjelas informasi." },
+    { icon: <Smile />, title: "Ikon", desc: "Mewakili info spesifik." },
+    { icon: <PieChart />, title: "Data/Angka", desc: "Fakta kuantitatif." },
+    { icon: <MessageSquare />, title: "Teks", desc: "Keterangan tambahan." },
+    { icon: <Link />, title: "Sumber", desc: "Asal usul data." }
+  ];
+
+  return (
+    <div className="h-full animate-fade-in overflow-y-auto">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-6">Mengenal Infografik</h2>
+      
+      <div className="bg-yellow-50 border-l-8 border-yellow-400 p-6 rounded-r-2xl mb-8 shadow-sm">
+        <h3 className="text-xl font-bold text-yellow-800 mb-2">Apa itu Infografik?</h3>
+        <p className="text-lg text-slate-700">
+          <strong>Infografik</strong> adalah bentuk penyajian informasi atau data dengan memadukan teks, gambar, simbol, warna, dan grafik agar informasi lebih mudah dan cepat dipahami.
+        </p>
+      </div>
+
+      <h3 className="text-2xl font-bold text-blue-800 mb-4 text-center">Unsur-Unsur Penting</h3>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        {elements.map((el, i) => (
+          <div key={i} className="bg-white border-2 border-blue-100 p-4 rounded-2xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition transform hover:-translate-y-1">
+            <div className="bg-blue-100 text-blue-600 p-3 rounded-full mb-3">{el.icon}</div>
+            <h4 className="font-bold text-slate-800">{el.title}</h4>
+            <p className="text-sm text-slate-500 mt-1">{el.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-green-50 rounded-2xl p-6 border-2 border-green-200">
+        <h3 className="text-xl font-bold text-green-800 mb-3">Cara Menganalisis:</h3>
+        <ol className="list-decimal list-inside space-y-2 text-slate-700 font-medium">
+          <li>Amati judul dan tema.</li>
+          <li>Identifikasi gambar, ikon, dan warna.</li>
+          <li>Bacalah teks dan data dengan teliti.</li>
+          <li>Tentukan pesan utamanya.</li>
+          <li>Periksa sumber informasinya (Tabayyun).</li>
+        </ol>
+      </div>
+    </div>
+  );
+}
+
+function Page5({ showModal }) {
+  const cultures = [
+    { title: "Batik Besurek", desc: "Batik khas Bengkulu dengan motif kaligrafi Arab dipadu bunga Rafflesia.", icon: <Star /> },
+    { title: "Tradisi Tabot", desc: "Upacara tradisional masyarakat Bengkulu untuk memperingati kisah kepahlawanan.", icon: <Shield /> },
+    { title: "Tari Andun", desc: "Tarian rakyat yang biasanya ditampilkan pada saat pesta perkawinan.", icon: <Music /> },
+    { title: "Alat Musik Dol", desc: "Alat musik pukul tradisional yang suaranya sangat menggema.", icon: <Play /> },
+    { title: "Bubungan Lima", desc: "Rumah adat tradisional dengan atap bertingkat khas masyarakat Melayu Bengkulu.", icon: <Home /> },
+    { title: "Permainan Tradisional", desc: "Lestarikan congklak, gasing, dan enggrang agar tidak punah.", icon: <Smile /> }
+  ];
+
+  return (
+    <div className="h-full animate-fade-in">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-2">Galeri Infografik Budaya</h2>
+      <p className="text-center text-slate-500 mb-8 font-medium">Klik pada kartu budaya untuk melihat detail informasinya!</p>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {cultures.map((c, i) => (
+          <div 
+            key={i} 
+            onClick={() => showModal(`Melestarikan ${c.title}`, c.desc)}
+            className="bg-white border-4 border-orange-100 hover:border-orange-400 rounded-3xl p-6 cursor-pointer shadow-sm hover:shadow-xl transition-all transform hover:-translate-y-2 flex flex-col items-center text-center group"
+          >
+            <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+              {React.cloneElement(c.icon, { size: 32 })}
+            </div>
+            <h3 className="font-bold text-xl text-slate-800">{c.title}</h3>
+            <p className="text-sm text-slate-500 mt-2 line-clamp-2">Lihat Detail...</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Page6() {
+  return (
+    <div className="h-full animate-fade-in overflow-y-auto pb-8 custom-scrollbar">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-6">Contoh Infografik Digital</h2>
+      
+      {/* CSS-BASED INFOGRAPHIC */}
+      <div className="max-w-2xl mx-auto bg-slate-900 rounded-3xl overflow-hidden shadow-2xl text-white font-sans border-8 border-slate-800">
+        
+        {/* Header dengan Rasio 16:9 */}
+        <div className="w-full aspect-video bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-2 text-yellow-300 drop-shadow-lg relative z-10">
+            Ayo Lestarikan
+          </h1>
+          <h2 className="text-2xl md:text-3xl font-bold relative z-10 text-white drop-shadow-md">
+            Kebudayaan Daerah Kita!
+          </h2>
+          <p className="mt-6 text-orange-50 font-medium italic relative z-10 bg-black/30 px-6 py-2 rounded-full backdrop-blur-sm border border-white/20">
+            "Budaya adalah identitas bangsa. Mari kita jaga!"
+          </p>
+        </div>
+
+        {/* Section 1 */}
+        <div className="bg-slate-800 p-6 border-b-4 border-slate-700">
+          <h3 className="text-xl font-bold text-green-400 mb-4 flex items-center gap-2"><Map /> Kenali Budaya Daerah</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-slate-700 p-3 rounded-lg text-center"><span className="text-2xl">🎭</span><p className="mt-2 text-sm font-bold">Tari Andun</p></div>
+            <div className="bg-slate-700 p-3 rounded-lg text-center"><span className="text-2xl">🥁</span><p className="mt-2 text-sm font-bold">Alat Musik Dol</p></div>
+          </div>
+        </div>
+
+        {/* Section 2 */}
+        <div className="bg-slate-900 p-6 border-b-4 border-slate-700">
+          <h3 className="text-xl font-bold text-blue-400 mb-4">Mengapa Harus Dilestarikan?</h3>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3"><CheckCircle className="text-green-500 shrink-0" /> Menjaga identitas daerah.</li>
+            <li className="flex items-start gap-3"><CheckCircle className="text-green-500 shrink-0" /> Menghargai warisan leluhur.</li>
+            <li className="flex items-start gap-3"><CheckCircle className="text-green-500 shrink-0" /> Memperkuat persatuan.</li>
+          </ul>
+        </div>
+
+        {/* Section 3 */}
+        <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 text-center">
+          <div className="inline-block bg-yellow-500 text-slate-900 font-black text-2xl px-6 py-2 rounded-full mb-4 transform -rotate-2">
+            AKU BANGGA!
+          </div>
+          <p className="text-lg font-bold">Kenali, Pelajari, Cintai, dan Lestarikan Budaya Indonesia!</p>
+          <p className="text-xs text-slate-500 mt-6">Sumber: Kemendikbudristek (Contoh)</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page7({ showModal }) {
+  const [found, setFound] = useState([]);
+
+  const handleFind = (part, desc) => {
+    if (!found.includes(part)) {
+      setFound([...found, part]);
+    }
+    showModal(`Ini adalah: ${part}`, desc);
+  };
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col items-center">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-2">Misi Interaktif: Bedah Infografik</h2>
+      <p className="text-slate-600 mb-4 font-bold bg-yellow-100 px-4 py-1 rounded-full">Temukan 4 unsur penting! (Ditemukan: {found.length}/4)</p>
+      
+      {found.length === 4 && (
+        <div className="bg-green-500 text-white font-bold px-6 py-2 rounded-full mb-4 animate-bounce">
+          🎉 Hebat! Kamu menemukan semuanya!
+        </div>
+      )}
+
+      <div className="w-full max-w-lg bg-gray-100 rounded-2xl p-4 md:p-6 border-4 border-gray-300 relative shadow-inner">
+        {/* Header/Title Area */}
+        <div 
+          onClick={() => handleFind('Judul Utama', 'Judul bertugas menarik perhatian pertama kali dan memberi tahu topik keseluruhan.')}
+          className="bg-blue-300 h-16 rounded-xl flex items-center justify-center mb-4 cursor-pointer hover:bg-blue-400 border-2 border-dashed border-blue-500 transition relative group shadow-sm hover:shadow-md"
+        >
+          <span className="font-black text-blue-800 text-xl group-hover:scale-110 transition">KLIK JUDUL</span>
+          {found.includes('Judul Utama') && <CheckCircle className="absolute right-4 text-green-700" size={24} />}
+        </div>
+        
+        {/* Main Image Area - Diubah menjadi rasio 16:9 */}
+        <div 
+          onClick={() => handleFind('Gambar Ilustrasi', 'Gambar visual yang memperjelas pesan agar mudah dipahami tanpa harus membaca banyak teks.')}
+          className="w-full aspect-video bg-gradient-to-br from-orange-300 to-red-400 rounded-xl flex flex-col items-center justify-center mb-4 cursor-pointer hover:shadow-lg hover:scale-[1.02] border-4 border-white shadow-md transition-all duration-300 relative group overflow-hidden"
+        >
+          <Camera size={64} className="text-white drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
+          <span className="absolute bottom-4 font-black text-white bg-black/30 px-4 py-1.5 rounded-full text-sm backdrop-blur-sm">KLIK AREA GAMBAR (16:9)</span>
+          {found.includes('Gambar Ilustrasi') && <div className="absolute inset-0 border-4 border-green-400 rounded-lg pointer-events-none"></div>}
+          {found.includes('Gambar Ilustrasi') && <CheckCircle size={36} className="absolute right-4 top-4 text-green-200 drop-shadow-lg" />}
+        </div>
+
+        <div className="flex gap-4 mb-4">
+          {/* Data Area */}
+          <div 
+            onClick={() => handleFind('Data & Angka', 'Berisi fakta kuantitatif/statistik. Ingat, harus dicek kebenarannya (Tabayyun)!')}
+            className="flex-1 bg-green-200 h-24 rounded-xl flex items-center justify-center cursor-pointer hover:bg-green-300 border-2 border-dashed border-green-500 transition relative group shadow-sm hover:shadow-md"
+          >
+            <PieChart size={32} className="text-green-700 mr-2 group-hover:rotate-12 transition-transform" />
+            <span className="font-bold text-green-800">KLIK DATA</span>
+            {found.includes('Data & Angka') && <CheckCircle className="absolute right-2 text-green-700" />}
+          </div>
+        </div>
+
+        {/* Source Area */}
+        <div 
+          onClick={() => handleFind('Sumber Informasi', 'Penting untuk mengetahui siapa pembuat data agar terhindar dari hoax.')}
+          className="bg-gray-300 h-12 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-400 border-2 border-dashed border-gray-500 transition relative group shadow-sm"
+        >
+          <span className="text-sm font-bold text-gray-700">KLIK SUMBER DI SINI</span>
+          {found.includes('Sumber Informasi') && <CheckCircle className="absolute right-4 text-green-700" size={20} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page8({ showModal }) {
+  const handleSave = () => {
+    showModal("Berhasil Disimpan!", "Jawaban investigasi kelompok kalian telah tersimpan ke dalam sistem digital. Lanjutkan presentasi!");
+  };
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-2">Misi Kelompok: Investigasi</h2>
+      <p className="text-center text-slate-500 mb-6 font-medium">Bekerja samalah membedah infografik dan isi LKPD berikut.</p>
+      
+      <div className="flex-1 overflow-y-auto px-2 space-y-6 pb-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-100">
+          <h3 className="font-bold text-blue-800 border-b-2 border-blue-100 pb-2 mb-4">A. IDENTIFIKASI UMUM</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">1. Apa judul dan tema utama?</label>
+              <textarea className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none" rows="2"></textarea>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">2. Siapa target pembaca infografik tersebut?</label>
+              <textarea className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
+          <h3 className="font-bold text-orange-800 border-b-2 border-orange-100 pb-2 mb-4">B. ANALISIS VISUAL</h3>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">3. Apa fungsi gambar/ilustrasi yang digunakan?</label>
+            <textarea className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-orange-400 focus:outline-none" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div className="text-center pt-4">
+          <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:-translate-y-1 transition text-lg">
+            Simpan Hasil Diskusi
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page9({ showModal }) {
+  const triggerClap = () => showModal("Tepuk Tangan Gemuruh! 👏", "Prok! Prok! Prok! Presentasi yang sangat luar biasa dari kelompok ini!");
+  const triggerStar = () => showModal("Bintang Penghargaan! ⭐", "Hebat! Kalian telah bekerja sama dengan baik dan memecahkan misteri infografik!");
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col items-center justify-center text-center">
+      <div className="bg-blue-100 p-6 rounded-full mb-6">
+        <Heart size={64} className="text-red-500 animate-pulse" />
+      </div>
+      <h2 className="text-4xl font-black text-blue-900 mb-4">Waktunya Apresiasi!</h2>
+      <p className="text-xl text-slate-600 mb-10 max-w-lg mx-auto">
+        Beri penghargaan kepada kelompok yang telah berani mempresentasikan hasil investigasinya dengan santun dan percaya diri.
+      </p>
+      
+      <div className="flex gap-6">
+        <button onClick={triggerClap} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-2xl shadow-xl transform hover:scale-105 transition flex flex-col items-center gap-2">
+          <span className="text-4xl">👏</span>
+          Beri Tepuk Tangan
+        </button>
+        <button onClick={triggerStar} className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-black py-4 px-8 rounded-2xl shadow-xl transform hover:scale-105 transition flex flex-col items-center gap-2">
+          <Star size={36} className="fill-current" />
+          Beri Bintang
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Page10({ showModal }) {
+  const handleSubmit = () => showModal("Ide Kreatif Tersimpan!", "Ide infografikmu sangat cemerlang! Nanti kita bisa mendesainnya secara nyata.");
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-6">Misi Kreatif: Rancang Infografikmu!</h2>
+      
+      <div className="flex-1 bg-white p-6 md:p-8 rounded-3xl shadow-md border-4 border-dashed border-green-300 overflow-y-auto">
+        <p className="text-center font-bold text-green-700 mb-6">Jika kamu membuat infografik melestarikan budaya, apa isinya?</p>
+        
+        <div className="space-y-4 max-w-2xl mx-auto">
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Judul Menarik:</label>
+            <input type="text" placeholder="Misal: Lestarikan Angklung!" className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 focus:border-green-400 focus:outline-none" />
+          </div>
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Gambar Utama yang Dipilih:</label>
+            <input type="text" placeholder="Misal: Gambar anak memegang angklung" className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 focus:border-green-400 focus:outline-none" />
+          </div>
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Pesan / Kalimat Ajakan:</label>
+            <textarea placeholder="Ayo bermain angklung agar warisan ini tidak punah!" className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 focus:border-green-400 focus:outline-none" rows="2"></textarea>
+          </div>
+          <button onClick={handleSubmit} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-md mt-4 transition transform hover:-translate-y-1">
+            Kumpulkan Rancangan Ide
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page11() {
+  return (
+    <div className="h-full animate-fade-in flex flex-col justify-center gap-6">
+      <h2 className="text-3xl font-black text-blue-900 text-center mb-2">Hikmah Pembelajaran</h2>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Duniawi */}
+        <div className="bg-blue-600 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-20"><Shield size={100} /></div>
+          <h3 className="text-2xl font-black mb-4 relative z-10">Manfaat Duniawi</h3>
+          <p className="text-lg relative z-10 font-medium opacity-90 leading-relaxed">
+            Mempelajari infografik membantu kita memilah informasi di internet, membedakan fakta dari berita bohong (Hoax), dan membantu mengambil keputusan berdasarkan data yang benar.
+          </p>
+        </div>
+
+        {/* Ukhrowi */}
+        <div className="bg-green-600 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-20"><Lightbulb size={100} /></div>
+          <h3 className="text-2xl font-black mb-4 relative z-10">Manfaat Ukhrowi</h3>
+          <div className="space-y-4 relative z-10">
+            <div className="bg-green-700/50 p-4 rounded-xl">
+              <p className="font-bold text-yellow-300">Mensyukuri Nikmat (QS. An-Nahl: 78)</p>
+              <p className="text-sm mt-1">Allah SWT memberi penglihatan dan akal untuk memahami informasi dengan baik.</p>
+            </div>
+            <div className="bg-green-700/50 p-4 rounded-xl">
+              <p className="font-bold text-yellow-300">Prinsip Tabayyun (QS. Al-Hujurat: 6)</p>
+              <p className="text-sm mt-1">Periksalah kebenaran setiap informasi dan data sebelum mempercayai atau menyebarkannya.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page12({ goHome }) {
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [feedback, setFeedback] = useState(null); // 'correct' or 'wrong'
+
+  const questions = [
+    { q: "Apa fungsi utama dari infografik?", options: ["Memperpanjang cerita", "Menyajikan informasi visual yang singkat", "Menyembunyikan data", "Hanya sebagai hiasan"], ans: 1 },
+    { q: "Unsur yang berfungsi menarik perhatian pertama kali adalah...", options: ["Teks kecil", "Sumber data", "Gambar / Visual", "Nama penulis"], ans: 2 },
+    { q: "Jika kita menemukan data angka di infografik, sikap Islami yang tepat adalah...", options: ["Langsung sebar", "Marah-marah", "Abaikan saja", "Tabayyun (Cek kebenaran)"], ans: 3 },
+    { q: "Mengapa infografik menggunakan warna yang beragam?", options: ["Untuk menarik mata dan membedakan info", "Supaya boros tinta cetak", "Karena salah desain", "Agar sulit dibaca"], ans: 0 },
+    // Simplified to 5 questions for component length, prompt asked for 10 but 5 is enough for functionality demo in single file. Let's add the rest quickly.
+    { q: "Pesan utama dalam infografik biasanya ditunjukkan melalui...", options: ["Judul dan teks yang mencolok", "Garis tepi gambar", "Logo pembuat", "Latar belakang"], ans: 0 },
+    { q: "Sumber informasi di bagian bawah infografik berguna untuk...", options: ["Hiasan saja", "Mengetahui validitas/keaslian data", "Menambah jumlah kata", "Syarat lomba"], ans: 1 },
+    { q: "QS. Al-Hujurat: 6 mengingatkan kita tentang...", options: ["Tabayyun", "Berpuasa", "Shalat wajib", "Haji"], ans: 0 },
+    { q: "Kata 'Info' pada infografik merujuk pada...", options: ["Informatika", "Informasi", "Infeksi", "Inferior"], ans: 1 },
+    { q: "Nikmat yang kita syukuri agar bisa melihat gambar adalah...", options: ["Pendengaran", "Penciuman", "Penglihatan", "Perasa"], ans: 2 },
+    { q: "Mengevaluasi infografik artinya...", options: ["Menghapusnya", "Menilai kesesuaian gambar dan teks", "Menjualnya", "Mewarnainya ulang"], ans: 1 }
+  ];
+
+  const handleAnswer = (index) => {
+    if (selected !== null) return; // Prevent double click
+    setSelected(index);
+    if (index === questions[currentQ].ans) {
+      setScore(score + 100);
+      setFeedback('correct');
+    } else {
+      setFeedback('wrong');
+    }
+
+    setTimeout(() => {
+      if (currentQ < questions.length - 1) {
+        setCurrentQ(currentQ + 1);
+        setSelected(null);
+        setFeedback(null);
+      } else {
+        setShowResult(true);
+      }
+    }, 1500);
+  };
+
+  const resetQuiz = () => {
+    setCurrentQ(0);
+    setScore(0);
+    setShowResult(false);
+    setSelected(null);
+    setFeedback(null);
+  };
+
+  if (showResult) {
+    return (
+      <div className="h-full animate-fade-in flex flex-col items-center justify-center text-center">
+        <h2 className="text-4xl font-black text-blue-900 mb-6">Skor Akhirmu!</h2>
+        <div className="text-7xl font-black text-orange-500 mb-6">{score}</div>
+        <p className="text-xl text-slate-600 mb-8">
+          {score >= 800 ? "Luar biasa! Kamu adalah Master Infografik!" : "Kerja bagus! Teruslah berlatih menelaah informasi."}
+        </p>
+        <div className="flex gap-4">
+          <button onClick={resetQuiz} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full">Ulangi Kuis</button>
+          <button onClick={goHome} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full">Ke Menu Utama</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full animate-fade-in flex flex-col">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-black text-blue-900">Kuis Petualangan</h2>
+        <div className="font-bold text-lg bg-orange-100 text-orange-600 px-4 py-1 rounded-full">Soal {currentQ + 1}/{questions.length}</div>
+      </div>
+      
+      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-md border-2 border-blue-100 flex-1 flex flex-col">
+        <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-8 text-center flex-1 flex items-center justify-center">
+          {questions[currentQ].q}
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {questions[currentQ].options.map((opt, idx) => {
+            let btnColor = "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700";
+            if (selected !== null) {
+              if (idx === questions[currentQ].ans) {
+                btnColor = "bg-green-500 border-green-600 text-white"; // Correct answer shows green
+              } else if (idx === selected) {
+                btnColor = "bg-red-500 border-red-600 text-white"; // Wrong choice shows red
+              } else {
+                btnColor = "bg-slate-100 border-slate-200 text-slate-400 opacity-50"; // Others fade
+              }
+            }
+
+            return (
+              <button 
+                key={idx} 
+                onClick={() => handleAnswer(idx)}
+                disabled={selected !== null}
+                className={`p-4 rounded-xl border-2 font-bold text-left transition-all ${btnColor}`}
+              >
+                {String.fromCharCode(65 + idx)}. {opt}
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Feedback Area */}
+        <div className="h-12 mt-6 flex items-center justify-center">
+          {feedback === 'correct' && <div className="text-green-500 font-bold text-xl flex items-center gap-2 animate-bounce"><CheckCircle /> Jawaban Tepat! +100 Poin</div>}
+          {feedback === 'wrong' && <div className="text-red-500 font-bold text-xl flex items-center gap-2 animate-bounce"><AlertCircle /> Kurang Tepat!</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Page13() {
+  return (
+    <div className="h-full animate-fade-in flex flex-col items-center justify-center text-center py-6">
+      <div className="bg-green-100 p-6 rounded-full mb-6 relative">
+        <div className="absolute inset-0 bg-green-200 rounded-full animate-ping opacity-50"></div>
+        <Smile size={64} className="text-green-600 relative z-10" />
+      </div>
+      
+      <h2 className="text-3xl md:text-4xl font-black text-blue-900 mb-6">Alhamdulillah, Luar Biasa!</h2>
+      
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 md:p-8 max-w-2xl mx-auto shadow-sm">
+        <p className="text-lg md:text-xl text-slate-700 leading-relaxed italic font-medium">
+          "Hari ini kita belajar bahwa infografik bukan hanya gambar yang menarik, tetapi juga sarana menyampaikan informasi yang bermanfaat. Gunakan akal untuk berpikir, mata untuk mengamati, dan hati untuk bersyukur."
+        </p>
+      </div>
+
+      <div className="mt-10 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-full font-bold shadow-sm flex items-center gap-2">
+        <ThumbsUp /> Petualangan Selesai. Terima kasih pahlawan cilik!
+      </div>
+    </div>
+  );
+}
